@@ -3,7 +3,8 @@ var Person = require('./person.js');
 
 class User {
     constructor(userId, name, surname, username, password, email) {
-        this.userId = userId;
+        if(userId !== undefined)
+            this.userId = userId;
         this.name = name;
         this.surname = surname;
         this.username = username;
@@ -15,7 +16,7 @@ class User {
         new db.Users({userId : personId})
         .fetch()
         .then((model) => {
-            if(model == null)
+            if(model === null)
                 callback({success: false});
             else
                 callback({success: true, data :model});

@@ -61,8 +61,8 @@ router.post('/register', function (req, res, next) {
 
     User.createUser(req.body.name, req.body.surname, req.body.username, req.body.password, req.body.email,
         (result) => {
-            if (!result.success) {
-                res.status(422);
+            if (!result) {
+                res.status(404);
                 res.send('Error while inserting data!');
             }
             else {
