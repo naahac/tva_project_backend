@@ -53,7 +53,7 @@ router.put('/', function (req, res, next) {
     });
 });
 
-router.post('/', function (req, res, next) {
+router.post('/register', function (req, res, next) {
     if (!req.body.name || !req.body.surname || !req.body.username || !req.body.password || !req.body.email) {
         res.status(400);
         res.send({ status: 'Requested data not received!' });
@@ -62,7 +62,7 @@ router.post('/', function (req, res, next) {
     User.createUser(req.body.name, req.body.surname, req.body.username, req.body.password, req.body.email,
         (result) => {
             if (!result.success) {
-                res.status(404);
+                res.status(422);
                 res.send('Error while inserting data!');
             }
             else {

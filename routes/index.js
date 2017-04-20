@@ -5,7 +5,7 @@ var User = require("./../models/user");
 var Token = require("./../models/token");
 
 router.get('/', function (req, res, next) {
-	res.render('index', { title: 'Book4Book' });
+	res.render('index', { title: 'Recept Backend' });
 });
 
 router.post('/login', function (req, res, next) {
