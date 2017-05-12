@@ -33,7 +33,7 @@ class User {
                 email:email },
                 {patch: true})
 			.then((model) => {
-				if (model == null)
+				if (model === null)
 					callback({ success: false });
 				callback({ success: true });
 			})

@@ -17,5 +17,20 @@ let Users = bookshelf.Model.extend({
     }
 });
 
+let Pictures = bookshelf.Model.extend({
+    tableName: 'picture',
+    idAttribute: 'pictureId'
+});
 
-module.exports = {Tokens, Users};
+let Ingredients = bookshelf.Model.extend({
+    tableName: 'ingredients',
+    idAttribute: 'ingredientId'
+});
+
+let Recipes = bookshelf.Model.extend({
+    tableName: 'recipe',
+    idAttribute: 'recipeId'
+});
+
+
+module.exports = {Tokens, Users, Pictures, Recipes};
