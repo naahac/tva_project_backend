@@ -42,7 +42,7 @@ class Token {
 
 	static createToken(userId, callback) {
 		let tokenId = this.CreateGUID();
-		let token = new Token(tokenId, new Date(),new Date().addDays(14) , true, userId);
+		let token = new Token(tokenId, new Date().toISOString(),(new Date().addDays(14)).toISOString() , true, userId);
 
 		new db.Tokens(token)
 			.save(null, { method: 'insert' })

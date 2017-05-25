@@ -2,11 +2,11 @@ var db = require('../database/database');
 
 class Recipe {
     constructor(recipeId, title, description, isPublic, userId, pictureId) {
-        if(recipeId !== undefined)
+        if(recipeId !== undefined && recipeId > 0)
             this.recipeId = recipeId;
         this.title = title;
         this.description = description;
-        this.isPublic = isPublic;
+        this.public = isPublic;
         this.userId = userId;
         if(pictureId !== undefined)
             this.pictureId = pictureId;
@@ -14,7 +14,7 @@ class Recipe {
 
     static getRecipesByUserId(userId, callback) {
         new db.Recipes({userId : userId})
-        .fetch()
+        .fetchAll({withRelated: ['ingredients', 'preparationSteps']})
         .then((model) => {
             if(model === null)
                 callback({success: false});
@@ -34,11 +34,34 @@ class Recipe {
             });
     }
 
-    static addRecipe(title, description, isPublic, userId, pictureId, callback) {
-            let recipe = new Recipe(undefined, title, description, isPublic, userId, pictureId);
-            new db.Recipes(recipe).save(null, { method: 'insert' });
-            console.log("recipe inserted");
-            callback(true);
+    static saveRecipe(recipeId, title, description, isPublic, userId, pictureId, callback) {
+            let recipe = new Recipe(recipeId, title, description, isPublic, userId, pictureId);
+            new db.Recipes(recipe)
+                .save(null, {  })
+                .then((recipe) => {
+                    console.log("recipe inserted or updated");
+                    callback(true, recipe);
+                })
+                .catch((error) => {
+                    console.log("recipe insert or update error");
+                    callback(false);
+                });
+
+    }
+
+    static updateRecipe(recipeId, title, description, isPublic, userId, pictureId, callback) {
+        let recipe = new Recipe(recipeId, title, description, isPublic, userId, pictureId);
+        new db.Recipes(recipe)
+            .save(null, { method: 'insert' })
+            .then((recipe) => {
+                console.log("recipe inserted");
+                callback(true, recipe);
+            })
+            .catch((error) => {
+                console.log("recipe insert error");
+                callback(false);
+            });
+
     }
 }
 

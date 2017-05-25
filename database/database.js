@@ -23,14 +23,34 @@ let Pictures = bookshelf.Model.extend({
 });
 
 let Ingredients = bookshelf.Model.extend({
-    tableName: 'ingredients',
-    idAttribute: 'ingredientId'
+    tableName: 'ingredient',
+    idAttribute: 'ingredientId',
+    recipe: function (){
+        return this.belongsTo(Recipes, 'recipeId')
+    }
+});
+
+let PreparationSteps = bookshelf.Model.extend({
+    tableName: 'preparation_step',
+    idAttribute: 'preparationStepId',
+    recipe: function (){
+        return this.belongsTo(Recipes, 'recipeId')
+    }
 });
 
 let Recipes = bookshelf.Model.extend({
     tableName: 'recipe',
-    idAttribute: 'recipeId'
+    idAttribute: 'recipeId',
+    user: function (){
+        return this.belongsTo(Users, 'userId')
+    },
+    ingredients: function() {
+        return this.hasMany(Ingredients, 'recipeId');
+    },
+    preparationSteps: function() {
+        return this.hasMany(PreparationSteps, 'recipeId');
+    }
 });
 
 
-module.exports = {Tokens, Users, Pictures, Recipes};
+module.exports = {Tokens, Users, Pictures, Recipes, Ingredients, PreparationSteps};
