@@ -22,7 +22,7 @@ class Ingredient {
     }
 
     static addIngredient(ingredientId, name, amount, recipeId, callback) {
-            let ingredient = new Ingredient(ingredientId, name, amount, recipeId);
+            let ingredient = new Ingredient(undefined, name, amount, recipeId);
             new db.Ingredients(ingredient)
                 .save(null, { })
                 .then((ingredient) => {
@@ -31,8 +31,22 @@ class Ingredient {
                 })
                 .catch((error) => {
                     console.log("ingredient insert error");
-                    callback(false);
+                    callback(false, error);
                 });
+    }
+
+    static deleteIngredients(recipeId, callback) {
+        new db.Ingredients()
+            .where({recipeId: recipeId})
+            .destroy()
+            .then((ingredient) => {
+                console.log("ingredient deleted");
+                callback(true, ingredient);
+            })
+            .catch((error) => {
+                console.log("ingredient delete error");
+                callback(false, error);
+            });
     }
 }
 

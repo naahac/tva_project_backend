@@ -21,7 +21,7 @@ class PreparationStep {
     }
 
     static addPreparationStep(preparationStepId, description, recipeId, callback) {
-            let preparationStep = new PreparationStep(preparationStepId, description, recipeId);
+            let preparationStep = new PreparationStep(undefined, description, recipeId);
             new db.PreparationSteps(preparationStep)
                 .save(null, {  })
                 .then((recipe) => {
@@ -30,8 +30,22 @@ class PreparationStep {
                 })
                 .catch((error) => {
                     console.log("step insert error");
-                    callback(false);
+                    callback(false, error);
                 });
+    }
+
+    static deletePreparationSteps(recipeId, callback) {
+        new db.PreparationSteps()
+            .where({recipeId: recipeId})
+            .destroy()
+            .then((ingredient) => {
+                console.log("step deleted");
+                callback(true, ingredient);
+            })
+            .catch((error) => {
+                console.log("step delete error");
+                callback(false);
+            });
     }
 }
 

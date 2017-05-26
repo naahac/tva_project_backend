@@ -75,7 +75,7 @@ router.post('/search', function (req, res, next) {
             res.status(400);
             res.send({status: 'User was not found!'});
         }else {
-            Recipe.getRecipesByUserId(result.userId, (result) => {
+            Recipe.searchRecipe(req.body, (result) => {
                 if (result === null || !result.success) {
                     res.status(404);
                     res.send({status: 'Recipes not found'});
@@ -149,7 +149,7 @@ router.put('/', function (req, res, next) {
 });
 
 function addRecipe(recipe,userId, pictureId, callback){
-    Recipe.saveRecipe(recipe.recipeId,recipe.title, recipe.description, recipe.isPublic, userId, pictureId, (success, insertedRecipe) => {
+    Recipe.saveRecipe(recipe.recipeId,recipe.title, recipe.description, recipe.isPublic, userId, pictureId, recipe.preparationTime, (success, insertedRecipe) => {
         if (!success) {
             callback(false);
         } else {
@@ -160,18 +160,24 @@ function addRecipe(recipe,userId, pictureId, callback){
 }
 
 function addIngredientsAndSteps(recipe, insertedRecipe){
-    for(let i = 0; i<recipe.ingredients.length; i++){
-        let ingredient = recipe.ingredients[i];
-        Ingredient.addIngredient(ingredient.ingredientId,ingredient.name,ingredient.amount,insertedRecipe.attributes.recipeId, (success, insertedIngredient) => {
-            console.log('insert ingredient: ' + success + ', ' + success ? insertedIngredient.attributes.ingredientId : " -1");
-        });
-    }
-    for(let i = 0; i<recipe.preparationSteps.length; i++){
-        let preparationStep = recipe.preparationSteps[i];
-        PreparationStep.addPreparationStep(preparationStep.preparationStepId,preparationStep.Description,insertedRecipe.attributes.recipeId, (success, insertedStep) => {
-            console.log('insert step: ' + success + ', ' + success ? insertedStep.attributes.preparationStepId : " -1");
-        });
-    }
+
+    Ingredient.deleteIngredients(insertedRecipe.attributes.recipeId, () => {
+        for(let i = 0; i<recipe.ingredients.length; i++){
+            let ingredient = recipe.ingredients[i];
+            Ingredient.addIngredient(ingredient.ingredientId,ingredient.name,ingredient.amount,insertedRecipe.attributes.recipeId, (success, insertedIngredient) => {
+                console.log('insert ingredient: ' + success);
+            });
+        }
+    });
+    PreparationStep.deletePreparationSteps(insertedRecipe.attributes.recipeId, () => {
+        for(let i = 0; i<recipe.preparationSteps.length; i++){
+            let preparationStep = recipe.preparationSteps[i];
+            PreparationStep.addPreparationStep(preparationStep.preparationStepId,preparationStep.Description,insertedRecipe.attributes.recipeId, (success, insertedStep) => {
+                console.log('insert step: ' + success);
+            });
+        }
+    });
+
 }
 
 module.exports = router;

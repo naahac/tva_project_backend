@@ -1,13 +1,15 @@
 var db = require('../database/database');
+var SearchRequest = require('../models/searchRequest');
 
 class Recipe {
-    constructor(recipeId, title, description, isPublic, userId, pictureId) {
+    constructor(recipeId, title, description, isPublic, userId, pictureId, preparationTime) {
         if(recipeId !== undefined && recipeId > 0)
             this.recipeId = recipeId;
         this.title = title;
         this.description = description;
         this.public = isPublic;
         this.userId = userId;
+        this.preparationTime = preparationTime;
         if(pictureId !== undefined)
             this.pictureId = pictureId;
     }
@@ -23,6 +25,25 @@ class Recipe {
         });
     }
 
+    static searchRecipe(data, callback) {
+        var searchReques = new SearchRequest(data.token, data.recipeName, data.minPreparationSteps, data.maxPreparationSteps, data.minIngredients, data.maxIngredients, data.minPreparationTime, data.maxPreparationTime);
+        new db.Recipes()
+            .where('title', 'LIKE', '%' + searchReques.recipeName + '%')
+            .where('preparationTime', '>', searchReques.minPreparationTime)
+            .where('preparationTime', '<', searchReques.maxPreparationTime)
+            .fetchAll({withRelated: ['ingredients', 'preparationSteps']})
+            .then((model) => {
+                if(model === null)
+                    callback({success: false});
+                else
+                    callback({success: true, data : model});
+            })
+            .catch((error) => {
+                console.log("error search");
+                callback({success: false});
+            });
+    }
+
     static getRecipeById(recipeId, callback) {
         new db.Recipes({recipeId : recipeId})
             .fetch()
@@ -34,8 +55,8 @@ class Recipe {
             });
     }
 
-    static saveRecipe(recipeId, title, description, isPublic, userId, pictureId, callback) {
-            let recipe = new Recipe(recipeId, title, description, isPublic, userId, pictureId);
+    static saveRecipe(recipeId, title, description, isPublic, userId, pictureId, preparationTime, callback) {
+            let recipe = new Recipe(recipeId, title, description, isPublic, userId, pictureId, preparationTime);
             new db.Recipes(recipe)
                 .save(null, {  })
                 .then((recipe) => {
@@ -46,11 +67,10 @@ class Recipe {
                     console.log("recipe insert or update error");
                     callback(false);
                 });
-
     }
 
-    static updateRecipe(recipeId, title, description, isPublic, userId, pictureId, callback) {
-        let recipe = new Recipe(recipeId, title, description, isPublic, userId, pictureId);
+    static updateRecipe(recipeId, title, description, isPublic, userId, pictureId, preparationTime, callback) {
+        let recipe = new Recipe(recipeId, title, description, isPublic, userId, pictureId, preparationTime);
         new db.Recipes(recipe)
             .save(null, { method: 'insert' })
             .then((recipe) => {
