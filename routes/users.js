@@ -13,6 +13,7 @@ router.get('/', function (req, res, next) {
         if (!result.success) {
             res.status(404);
             res.send({ status: 'Token not found!' });
+            return;
         }
 
         User.getUser(result.data.get('userId'), (user) => {
@@ -27,24 +28,27 @@ router.get('/', function (req, res, next) {
 });
 
 router.put('/', function (req, res, next) {
-    checkToken(req.body.tokenId, res);
+    checkToken(req.query.tokenId, res);
 
-    if (!req.body.name || !req.body.surname || !req.body.username || !req.body.password || !req.body.email) {
+    if (!req.body.name || !req.body.surname || !req.body.email) {
         res.status(400);
         res.send({ status: 'Requested data not received!' });
+        return;
     }
 
-    Token.getUserId(req.body.tokenId, (result) => {
+    Token.getActiveToken(req.query.tokenId, (result) => {
         if (!result.success) {
             res.status(400);
             res.send({ status: 'User was not found!' });
+            return;
         }
 
-        User.updateUser(userId, req.body.name, req.body.surname, req.body.username, req.body.password, req.body.email,
+        User.updateUser(result.data.attributes.userId, req.body.name, req.body.surname, req.body.email,
             (result) => {
                 if (!result.success) {
                     res.status(404);
                     res.send({ status: 'Error while updating!' });
+                    return;
                 }
                 else {
                     res.send({ status: 'OK' });

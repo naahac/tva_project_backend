@@ -19,17 +19,16 @@ class User {
             if(model === null)
                 callback({success: false});
             else
-                callback({success: true, data :model});
+                callback(model);
         });
     }
 
-    static updateUser(personId, name, surname, username, password, email, callback) {
-        new db.Users({ userId: personId })
+    static updateUser(personId, name, surname, email, callback) {
+        new db.Users()
+            .where('userId', '=', personId)
 			.save({ userId:personId,
                 name:name,
                 surname:surname,
-                username:username,
-                password:password,
                 email:email },
                 {patch: true})
 			.then((model) => {
