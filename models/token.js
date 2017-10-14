@@ -77,7 +77,7 @@ class Token {
 				if (model == null)
 					callback({success:false});
 				else
-					callback({success:true, data:model.get('tokenId')});
+					callback({success:true, data:model});
 			})
 			.catch((err) => {
 				callback({success:false});
